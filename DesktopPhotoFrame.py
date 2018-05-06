@@ -16,7 +16,6 @@ def images():
     else:
         im.extend(images_for(os.getcwd()))
     return sorted(im)
-    #return sorted(im, key=lambda s:s.lower())
 
 def images_for(path):
     if os.path.isfile(path):
@@ -27,9 +26,28 @@ def images_for(path):
             i.append(match)
     return i
 
+class Win(tk.Tk):
+    def __init__(self,master=None):
+        tk.Tk.__init__(self,master)
+        self.overrideredirect(True)
+        self.wm_attributes("-topmost", 1)
+        self._offsetx = 0
+        self._offsety = 0
+        self.bind('<ButtonPress-1>',self.clickwin)
+        self.bind('<B1-Motion>',self.dragwin)
+        
+    def dragwin(self,event):
+        x = self.winfo_pointerx() - self._offsetx
+        y = self.winfo_pointery() - self._offsety
+        self.geometry('+{x}+{y}'.format(x=x,y=y))
+
+    def clickwin(self,event):
+        self._offsetx = event.x
+        self._offsety = event.y
+
 class App():
     def __init__(self):
-        self.root = tk.Tk()
+        self.root = Win()
         self.root.pack_propagate(False)
         self.root.config(bg="black", width=500, height=500)
         self._fullscreen = True
@@ -64,7 +82,6 @@ class App():
             self.root.attributes('-fullscreen', True)
         else:
             self.root.attributes('-fullscreen', False)
-            #self.root.attributes("-zoomed", True)
 
     def esc_handler(self, e):
         self.root.destroy()
@@ -148,11 +165,5 @@ def scaled_size(width, height, box_width, box_height):
         return int(box_height/float(height) * width), box_height
     else:
         return box_width, int(box_width/float(width) * height)
-
-def test_scaled_size():
-    x = scaled_size(width=1871, height=1223, box_width=1920, box_height=1080)
-    assert x == (1652, 1080)
-    x = scaled_size(width=100, height=100, box_width=1920, box_height=1080)
-    assert x ==(1080, 1080)
 
 if __name__ == '__main__': app=App()
