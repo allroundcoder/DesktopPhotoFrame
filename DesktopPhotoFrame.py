@@ -36,17 +36,14 @@ class App():
         self.root.pack_propagate(False)
         self.root.config(bg="black", width=500, height=500)
         self._fullscreen = True
-        self.f_handler(0)
         self._images = [img for img in os.listdir('.') if img.lower()[-4:] in ('.jpg', '.png', '.gif')]
         self._image_pos = -1
 
-        self.root.bind("<Return>", self.return_handler)
         self.root.bind("<space>", self.space_handler)
         self.root.bind("<Escape>", self.esc_handler)
         self.root.bind("<Left>", self.show_previous_image)
         self.root.bind("<Right>", self.show_next_image)
         self.root.bind("q", self.esc_handler)
-        self.root.bind("f", self.f_handler)
         self.root.after(100, self.show_next_image)
 
         self.label = tk.Label(self.root, image=None)
@@ -61,18 +58,8 @@ class App():
     paused = False
     image = None
 
-    def f_handler(self, e):
-        self._fullscreen = not self._fullscreen
-        if self._fullscreen:
-            self.root.attributes('-fullscreen', True)
-        else:
-            self.root.attributes('-fullscreen', False)
-
     def esc_handler(self, e):
         self.root.destroy()
-
-    def return_handler(self, e):
-        self.show_next_image()
 
     def space_handler(self, _):
         self.paused = not self.paused
