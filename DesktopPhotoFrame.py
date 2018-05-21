@@ -10,24 +10,6 @@ if sys.version_info < (3, 0):
     import Tkinter as tk
 else:
     import tkinter as tk
-	
-def images():
-    im = []
-    if len(sys.argv) > 1:
-        for path in sys.argv[1:]:
-            im.extend(images_for(path))
-    else:
-        im.extend(images_for(os.getcwd()))
-    return sorted(im)
-
-def images_for(path):
-    if os.path.isfile(path):
-        return [path]
-    i = []
-    for match in glob.glob("%s/*" % path):
-        if match.lower()[-4:] in ('.jpg', '.png', '.gif'):
-            i.append(match)
-    return i
 
 class Win(tk.Tk):
     def __init__(self,master=None):
@@ -55,7 +37,7 @@ class App():
         self.root.config(bg="black", width=500, height=500)
         self._fullscreen = True
         self.f_handler(0)
-        self._images = images()
+        self._images = [img for img in os.listdir('.') if img.lower()[-4:] in ('.jpg', '.png', '.gif')]
         self._image_pos = -1
 
         self.root.bind("<Return>", self.return_handler)
@@ -128,12 +110,20 @@ class App():
             return
         self.fit_to_box()
 
+    def scaled_size(self, width, height, box_width, box_height):
+        source_ratio = width / float(height)
+        box_ratio = box_width / float(box_height)
+        if source_ratio < box_ratio:
+            return int(box_height/float(height) * width), box_height
+        else:
+            return box_width, int(box_width/float(width) * height)
+
     def fit_to_box(self):
         if self.image:
             if self.image.size[0] == self.box_width: return
             if self.image.size[1] == self.box_height: return
         width, height = self.original_image.size
-        new_size = scaled_size(width, height, self.box_width, self.box_height)
+        new_size = self.scaled_size(width, height, self.box_width, self.box_height)
         self.image = self.original_image.resize(new_size, Image.ANTIALIAS)
         self.label.place(x=self.box_width/2, y=self.box_height/2, anchor=tk.CENTER)
         tkimage = ImageTk.PhotoImage(self.image)
@@ -160,13 +150,5 @@ class App():
             return None
         self._image_pos -= 1
         return self._images[self._image_pos]
-
-def scaled_size(width, height, box_width, box_height):
-    source_ratio = width / float(height)
-    box_ratio = box_width / float(box_height)
-    if source_ratio < box_ratio:
-        return int(box_height/float(height) * width), box_height
-    else:
-        return box_width, int(box_width/float(width) * height)
 
 if __name__ == '__main__': app=App()
