@@ -29,11 +29,12 @@ class Win(tk.Tk):
     def clickwin(self,event):
         self._offsetx = event.x
         self._offsety = event.y
-
+    
 class App():
     def __init__(self):
         self.root = Win()
         self.root.pack_propagate(False)
+        self.root.config(bg="black", width=1, height=1)
         self._images = [img for img in os.listdir('.') if img.lower()[-4:] in ('.jpg', '.png', '.gif')]
         self._image_pos = -1
 
@@ -51,7 +52,7 @@ class App():
         self.set_timer()
         self.root.mainloop()
    
-    slide_show_time = 4
+    slide_show_time = 60
     last_view_time = 0
     paused = False
     image = None
@@ -88,26 +89,57 @@ class App():
     def show_image(self, fname):
         self.original_image = Image.open(fname)
         self.image = None
-        
+
+        # screen
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        screen_nr = (self.root.winfo_x() / screen_width)
+        screen_center_x = (screen_width / 2) + (screen_nr * screen_width)
+        screen_center_y = (screen_height / 2)
+
+        # image
         width, height = self.original_image.size
         aspect_ratio = float(width) / float(height)
         
-        screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight()
-        
+        # window
+        win_x = self.root.winfo_x()
+        win_y = self.root.winfo_y()
+        win_width = self.root.winfo_width()
+        win_height = self.root.winfo_height()
+        win_center_x = win_x + (win_width / 2)
+        win_center_y = win_y + (win_height / 2)
+
+        # size
         if width > height:
             # landscape
-            new_width = int(screen_width * (self.percentage_of_screen_width / 100.0))
-            new_height = int(new_width / aspect_ratio)  
+            new_win_width = int(screen_width * (self.percentage_of_screen_width / 100.0))
+            new_win_height = int(new_win_width / aspect_ratio)  
         else:
             # portrait
-            new_height = int(screen_height * (self.percentage_of_screen_height / 100.0))
-            new_width = int(new_height * aspect_ratio)
+            new_win_height = int(screen_height * (self.percentage_of_screen_height / 100.0))
+            new_win_width = int(new_win_height * aspect_ratio)
             
-        new_size = (new_width,new_height)
-        self.root.geometry('%dx%d' % new_size)
+        new_size = (new_win_width,new_win_height)
+         
+        # position
+        if win_center_x < screen_center_x:
+            # left
+            new_x = win_x
+        else:
+            # right
+            new_x = win_x + win_width - new_win_width
+
+        if win_center_y < screen_center_y:
+            # top
+            new_y = win_y
+        else:
+            # bottom
+            new_y = win_y + win_height - new_win_height
+
+        # apply changes
+        self.root.geometry('{}x{}+{}+{}'.format(new_win_width, new_win_height, new_x, new_y))
         self.image = self.original_image.resize(new_size, Image.ANTIALIAS)
-        self.label.place(x=0, y=0, width=new_width,height=new_height)
+        self.label.place(x=0, y=0, width=new_win_width,height=new_win_height)
         tkimage = ImageTk.PhotoImage(self.image)
         self.label.configure(image=tkimage)
         self.label.image = tkimage
