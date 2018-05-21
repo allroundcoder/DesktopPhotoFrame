@@ -3,11 +3,14 @@ import os
 import sys
 import time
 
-import Image
-import ImageTk
+from PIL import Image
+from PIL import ImageTk
 
-import Tkinter as tk
-
+if sys.version_info < (3, 0):
+    import Tkinter as tk
+else:
+    import tkinter as tk
+	
 def images():
     im = []
     if len(sys.argv) > 1:
