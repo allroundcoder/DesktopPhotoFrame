@@ -34,8 +34,6 @@ class App():
     def __init__(self):
         self.root = Win()
         self.root.pack_propagate(False)
-        self.root.config(bg="black", width=500, height=500)
-        self._fullscreen = True
         self._images = [img for img in os.listdir('.') if img.lower()[-4:] in ('.jpg', '.png', '.gif')]
         self._image_pos = -1
 
@@ -57,6 +55,8 @@ class App():
     last_view_time = 0
     paused = False
     image = None
+    percentage_of_screen_width = 20
+    percentage_of_screen_height = 40
 
     def esc_handler(self, e):
         self.root.destroy()
@@ -72,7 +72,6 @@ class App():
            and not self.paused:
             self.show_next_image()
         self.set_timer()
-        self.check_image_size()
 
     def show_next_image(self, e=None):
         fname = self.next_image()
@@ -89,42 +88,32 @@ class App():
     def show_image(self, fname):
         self.original_image = Image.open(fname)
         self.image = None
-        self.fit_to_box()
-        self.last_view_time = time.time()
-
-    def check_image_size(self):
-        if not self.image:
-            return
-        self.fit_to_box()
-
-    def scaled_size(self, width, height, box_width, box_height):
-        source_ratio = width / float(height)
-        box_ratio = box_width / float(box_height)
-        if source_ratio < box_ratio:
-            return int(box_height/float(height) * width), box_height
-        else:
-            return box_width, int(box_width/float(width) * height)
-
-    def fit_to_box(self):
-        if self.image:
-            if self.image.size[0] == self.box_width: return
-            if self.image.size[1] == self.box_height: return
+        
         width, height = self.original_image.size
-        new_size = self.scaled_size(width, height, self.box_width, self.box_height)
+        aspect_ratio = float(width) / float(height)
+        
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        
+        if width > height:
+            # landscape
+            new_width = int(screen_width * (self.percentage_of_screen_width / 100.0))
+            new_height = int(new_width / aspect_ratio)  
+        else:
+            # portrait
+            new_height = int(screen_height * (self.percentage_of_screen_height / 100.0))
+            new_width = int(new_height * aspect_ratio)
+            
+        new_size = (new_width,new_height)
+        self.root.geometry('%dx%d' % new_size)
         self.image = self.original_image.resize(new_size, Image.ANTIALIAS)
-        self.label.place(x=self.box_width/2, y=self.box_height/2, anchor=tk.CENTER)
+        self.label.place(x=0, y=0, width=new_width,height=new_height)
         tkimage = ImageTk.PhotoImage(self.image)
         self.label.configure(image=tkimage)
         self.label.image = tkimage
-
-    @property
-    def box_width(self):
-        return self.root.winfo_width()
-
-    @property
-    def box_height(self):
-        return self.root.winfo_height()
-
+        
+        self.last_view_time = time.time()
+        
     def next_image(self):
         if not self._images: 
             return None
