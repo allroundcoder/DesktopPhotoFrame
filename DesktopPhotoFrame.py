@@ -51,13 +51,16 @@ class App():
 
         self.set_timer()
         self.root.mainloop()
-   
-    slide_show_time = 60
+    
+    # setings   
+    slide_show_time = 300
     last_view_time = 0
     paused = False
     image = None
-    percentage_of_screen_width = 20
-    percentage_of_screen_height = 40
+
+    # Window width in landscape orientation. The same value is used
+    # for the window height in portrait orientation.
+    window_width_in_percentage_of_screen_width = 20
 
     def esc_handler(self, e):
         self.root.destroy()
@@ -73,6 +76,19 @@ class App():
            and not self.paused:
             self.show_next_image()
         self.set_timer()
+
+    def next_image(self):
+        if not self._images: 
+            return None
+        self._image_pos += 1
+        self._image_pos %= len(self._images)
+        return self._images[self._image_pos]
+
+    def previous_image(self):
+        if not self._images: 
+            return None
+        self._image_pos -= 1
+        return self._images[self._image_pos]
 
     def show_next_image(self, e=None):
         fname = self.next_image()
@@ -93,7 +109,7 @@ class App():
         # screen
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
-        screen_nr = (self.root.winfo_x() / screen_width)
+        screen_nr = int(self.root.winfo_x() / screen_width)
         screen_center_x = (screen_width / 2) + (screen_nr * screen_width)
         screen_center_y = (screen_height / 2)
 
@@ -109,14 +125,16 @@ class App():
         win_center_x = win_x + (win_width / 2)
         win_center_y = win_y + (win_height / 2)
 
+        new_win_width_land = int(screen_width * (self.window_width_in_percentage_of_screen_width / 100.0))
+        
         # size
         if width > height:
             # landscape
-            new_win_width = int(screen_width * (self.percentage_of_screen_width / 100.0))
+            new_win_width = new_win_width_land
             new_win_height = int(new_win_width / aspect_ratio)  
         else:
             # portrait
-            new_win_height = int(screen_height * (self.percentage_of_screen_height / 100.0))
+            new_win_height = new_win_width_land
             new_win_width = int(new_win_height * aspect_ratio)
             
         new_size = (new_win_width,new_win_height)
@@ -128,14 +146,14 @@ class App():
         else:
             # right
             new_x = win_x + win_width - new_win_width
-
+            
         if win_center_y < screen_center_y:
             # top
             new_y = win_y
         else:
             # bottom
             new_y = win_y + win_height - new_win_height
-
+            
         # apply changes
         self.root.geometry('{}x{}+{}+{}'.format(new_win_width, new_win_height, new_x, new_y))
         self.image = self.original_image.resize(new_size, Image.ANTIALIAS)
@@ -146,17 +164,4 @@ class App():
         
         self.last_view_time = time.time()
         
-    def next_image(self):
-        if not self._images: 
-            return None
-        self._image_pos += 1
-        self._image_pos %= len(self._images)
-        return self._images[self._image_pos]
-
-    def previous_image(self):
-        if not self._images: 
-            return None
-        self._image_pos -= 1
-        return self._images[self._image_pos]
-
 if __name__ == '__main__': app=App()
