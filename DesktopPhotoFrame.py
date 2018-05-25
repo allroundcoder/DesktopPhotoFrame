@@ -16,7 +16,7 @@ else:
 ###################
 SLIDE_SHOW_TIME = 300
 
-# Window height in landscape orientation. The same value is used
+# Window height in portrait orientation. The same value is used
 # for the window width in landscape orientation.
 WINDOW_HEIGHT_IN_PERCENTAGE_OF_SCREEN_HEIGHT = 30
 ###################
@@ -63,7 +63,6 @@ class App():
         self.label.pack()
 
         self.set_timer()
-        self.root.focus_set()
         self.root.mainloop()
     
     def esc_handler(self, e):
