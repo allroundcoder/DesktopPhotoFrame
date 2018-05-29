@@ -2,7 +2,7 @@ import glob
 import os
 import sys
 import time
-
+from itertools import cycle
 from PIL import Image
 from PIL import ImageTk
 
@@ -14,7 +14,7 @@ else:
 ###################
 # General setings #  
 ###################
-SLIDE_SHOW_TIME = 300
+SLIDE_SHOW_TIME_MS = 300 * 1000
 
 # Window height in portrait orientation. The same value is used
 # for the window width in landscape orientation.
@@ -24,13 +24,20 @@ WINDOW_HEIGHT_IN_PERCENTAGE_OF_SCREEN_HEIGHT = 30
 class Win(tk.Tk):
     def __init__(self,master=None):
         tk.Tk.__init__(self,master)
+        self.config(bg="black", width=1, height=1)
         self.overrideredirect(True)
         self.wm_attributes("-topmost", 1)
-        self.offsetx = 0
-        self.offsety = 0
+        self.pack_propagate(False)
+        
         self.bind('<ButtonPress-1>',self.clickwin)
         self.bind('<B1-Motion>',self.dragwin)
-
+        self.bind("<Escape>", self.esc_handler)
+        self.bind("q", self.esc_handler)
+        self.bind('<Triple-Button-1>',self.esc_handler)
+        
+        self.offsetx = 0
+        self.offsety = 0
+        
     def dragwin(self,event):
         x = self.winfo_pointerx() - self.offsetx
         y = self.winfo_pointery() - self.offsety
@@ -39,72 +46,31 @@ class Win(tk.Tk):
     def clickwin(self,event):
         self.offsetx = event.x
         self.offsety = event.y
-
+    
+    def esc_handler(self,event):
+        self.destroy()
+    
 class App():
     def __init__(self):
         self.root = Win()
-        self.root.pack_propagate(False)
-        self.root.config(bg="black", width=1, height=1)
-        self.images = [img for img in os.listdir('.') if img.lower()[-4:] in ('.jpg', '.png', '.gif')]
-        self.image_pos = -1
-        self.last_view_time = 0
+        self.root.bind("<Right>", self.show_next_image)
+        
+        self.images = cycle([img for img in os.listdir('.') if img.lower()[-4:] in ('.jpg', '.png', '.gif')])
         self.image = None
     
-        self.root.bind("<Escape>", self.esc_handler)
-        self.root.bind("<Left>", self.show_previous_image)
-        self.root.bind("<Right>", self.show_next_image)
-        self.root.bind("q", self.esc_handler)
-        self.root.bind('<Triple-Button-1>',self.esc_handler)
-        
-        self.root.after(100, self.show_next_image)
-
         self.label = tk.Label(self.root, image=None)
         self.label.configure(borderwidth=0)
         self.label.pack()
-
-        self.set_timer()
+    
+        self.root.after(100, self.timer_cb) 
         self.root.mainloop()
     
-    def esc_handler(self, e):
-        self.root.destroy()
-
-    def set_timer(self):
-        self.root.after(300, self.update_clock)
-
-    def update_clock(self):
-        if time.time() - self.last_view_time > SLIDE_SHOW_TIME:
-            self.show_next_image()
-        self.set_timer()
-
-    def next_image(self):
-        if not self.images: 
-            return None
-        self.image_pos += 1
-        self.image_pos %= len(self.images)
-        return self.images[self.image_pos]
-
-    def previous_image(self):
-        if not self.images: 
-            return None
-        
-        if self.image_pos > 0:
-            self.image_pos -= 1
-        return self.images[self.image_pos]
+    def timer_cb(self,e=None):
+        self.show_next_image()
+        self.root.after(SLIDE_SHOW_TIME_MS, self.timer_cb)
 
     def show_next_image(self, e=None):
-        fname = self.next_image()
-        if not fname:
-            return
-        self.show_image(fname)
-
-    def show_previous_image(self, e=None):
-        fname = self.previous_image()
-        if not fname:
-            return
-        self.show_image(fname)
-
-    def show_image(self, fname):
-        self.original_image = Image.open(fname)
+        self.original_image = Image.open(next(self.images))
         self.image = None
 
         # screen
@@ -162,7 +128,5 @@ class App():
         tkimage = ImageTk.PhotoImage(self.image)
         self.label.configure(image=tkimage)
         self.label.image = tkimage
-        
-        self.last_view_time = time.time()
         
 if __name__ == '__main__': app=App()
