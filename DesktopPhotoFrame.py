@@ -14,7 +14,7 @@ else:
 ###################
 # General setings #  
 ###################
-SLIDE_SHOW_TIME_MS = 3 * 1000
+SLIDE_SHOW_TIME_MS = 300 * 1000
 
 # Window height in portrait orientation. The same value is used
 # for the window width in landscape orientation.
