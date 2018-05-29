@@ -14,7 +14,7 @@ else:
 ###################
 # General setings #  
 ###################
-SLIDE_SHOW_TIME_MS = 300 * 1000
+SLIDE_SHOW_TIME_MS = 3 * 1000
 
 # Window height in portrait orientation. The same value is used
 # for the window width in landscape orientation.
@@ -70,7 +70,7 @@ class App():
         self.root.after(SLIDE_SHOW_TIME_MS, self.timer_cb)
 
     def show_next_image(self, e=None):
-        self.original_image = Image.open(next(self.images))
+        self.new_image = Image.open(next(self.images))
         self.image = None
 
         # screen
@@ -80,10 +80,6 @@ class App():
         screen_center_x = (screen_width / 2) + (screen_nr * screen_width)
         screen_center_y = (screen_height / 2)
 
-        # image
-        width, height = self.original_image.size
-        aspect_ratio = float(width) / float(height)
-        
         # window
         win_x = self.root.winfo_x()
         win_y = self.root.winfo_y()
@@ -92,38 +88,42 @@ class App():
         win_center_x = win_x + (win_width / 2)
         win_center_y = win_y + (win_height / 2)
 
+        # new image
+        img_width, img_height = self.new_image.size
+        img_aspect_ratio = float(img_width) / float(img_height)
+        
+        # calculate new window size
         new_win_height_port = int(screen_height * (WINDOW_HEIGHT_IN_PERCENTAGE_OF_SCREEN_HEIGHT / 100.0))
         
-        # size
-        if width > height:
+        if img_width > img_height:
             # landscape
             new_win_width = new_win_height_port
-            new_win_height = int(new_win_width / aspect_ratio)
+            new_win_height = int(new_win_width / img_aspect_ratio)
         else:
             # portrait
             new_win_height = new_win_height_port
-            new_win_width = int(new_win_height * aspect_ratio)
+            new_win_width = int(new_win_height * img_aspect_ratio)
             
-        new_size = (new_win_width,new_win_height)
+        new_win_size = (new_win_width,new_win_height)
          
-        # position
+        # calculate new window position
         if win_center_x < screen_center_x:
             # left
-            new_x = win_x
+            new_win_x = win_x
         else:
             # right
-            new_x = win_x + win_width - new_win_width
+            new_win_x = win_x + win_width - new_win_width
             
         if win_center_y < screen_center_y:
             # top
-            new_y = win_y
+            new_win_y = win_y
         else:
             # bottom
-            new_y = win_y + win_height - new_win_height
+            new_win_y = win_y + win_height - new_win_height
             
         # apply changes
-        self.root.geometry('{0}x{1}+{2}+{3}'.format(new_win_width, new_win_height, new_x, new_y))
-        self.image = self.original_image.resize(new_size, Image.ANTIALIAS)
+        self.root.geometry('{0}x{1}+{2}+{3}'.format(new_win_width, new_win_height, new_win_x, new_win_y))
+        self.image = self.new_image.resize(new_win_size, Image.ANTIALIAS)
         self.label.place(x=0, y=0, width=new_win_width,height=new_win_height)
         tkimage = ImageTk.PhotoImage(self.image)
         self.label.configure(image=tkimage)
