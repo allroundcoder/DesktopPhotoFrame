@@ -14,7 +14,7 @@ else:
 ###################
 # General setings #  
 ###################
-SLIDE_SHOW_TIME_MS = 300 * 1000
+SLIDE_SHOW_TIME_MS = 3 * 1000
 
 # Window height in portrait orientation. The same value is used
 # for the window width in landscape orientation.
@@ -31,9 +31,11 @@ class Win(tk.Tk):
         
         self.bind('<ButtonPress-1>',self.clickwin)
         self.bind('<B1-Motion>',self.dragwin)
-        self.bind("<Escape>", self.esc_handler)
-        self.bind("q", self.esc_handler)
-        self.bind('<Triple-Button-1>',self.esc_handler)
+        self.bind("<Escape>", self.close)
+        self.bind("q", self.close)
+        self.bind('<Triple-Button-1>',self.close)
+        self.bind("<Down>", self.minimize)
+        self.bind("<Configure>", self.restore)
         
         self.offsetx = 0
         self.offsety = 0
@@ -47,8 +49,20 @@ class Win(tk.Tk):
         self.offsetx = event.x
         self.offsety = event.y
     
-    def esc_handler(self,event):
+    def close(self,event):
         self.destroy()
+        
+    def minimize(self,event):
+        self.overrideredirect(False)
+        self.wm_state('iconic')
+    
+    def restore(self,event):
+        if self.winfo_viewable():
+            self.overrideredirect(True)    
+    
+    @property
+    def is_viewable(self):
+        return self.winfo_viewable()
     
 class App():
     def __init__(self):
@@ -66,7 +80,8 @@ class App():
         self.root.mainloop()
     
     def timer_cb(self,e=None):
-        self.show_next_image()
+        if self.root.is_viewable:
+            self.show_next_image()
         self.root.after(SLIDE_SHOW_TIME_MS, self.timer_cb)
 
     def show_next_image(self, e=None):
