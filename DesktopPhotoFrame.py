@@ -72,10 +72,9 @@ class App():
         self.images = cycle([img for img in os.listdir('.') if img.lower()[-4:] in ('.jpg', '.png', '.gif')])
         self.image = None
     
-        self.label = tk.Label(self.root, image=None)
-        self.label.configure(borderwidth=0)
-        self.label.pack()
-    
+        self.canvas = tk.Canvas(self.root, bg="yellow")
+        self.canvas_image = self.canvas.create_image(0,0,anchor=tk.NW,image=None)
+        self.canvas.pack(expand = True, fill = "both")
         self.root.after(100, self.timer_cb) 
         self.root.mainloop()
     
@@ -138,10 +137,7 @@ class App():
             
         # apply changes
         self.root.geometry('{0}x{1}+{2}+{3}'.format(new_win_width, new_win_height, new_win_x, new_win_y))
-        self.image = self.new_image.resize(new_win_size, Image.ANTIALIAS)
-        self.label.place(x=0, y=0, width=new_win_width,height=new_win_height)
-        tkimage = ImageTk.PhotoImage(self.image)
-        self.label.configure(image=tkimage)
-        self.label.image = tkimage
+        self.image = ImageTk.PhotoImage(self.new_image.resize(new_win_size, Image.ANTIALIAS))
+        self.canvas.itemconfig(self.canvas_image, image=self.image)
         
 if __name__ == '__main__': app=App()
