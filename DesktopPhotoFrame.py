@@ -31,14 +31,25 @@ class Win(tk.Tk):
         
         self.bind('<ButtonPress-1>',self.clickwin)
         self.bind('<B1-Motion>',self.dragwin)
-        self.bind("<Escape>", self.close)
-        self.bind("q", self.close)
         self.bind('<Triple-Button-1>',self.close)
-        self.bind("<Down>", self.minimize)
         self.bind("<Configure>", self.restore)
+        self.bind("<Enter>", self.enter)
+        self.bind("<Leave>", self.leave)
         
         self.offsetx = 0
         self.offsety = 0
+        
+        self.canvas = tk.Canvas(self, bg="yellow")
+        self.canvas_image = self.canvas.create_image(0,0,anchor=tk.NW,image=None)
+        self.quit_button = tk.Button(self, text = "Quit", command = self.close, anchor = 'w', activebackground = "#33B5E5")
+        self.quit_button_window = self.canvas.create_window(0, 0, anchor='nw', window=self.quit_button, state='hidden')
+        self.canvas.pack(expand = True, fill = "both")
+
+    def enter(self,event):
+        self.canvas.itemconfigure(self.quit_button_window,state = 'normal')
+        
+    def leave(self,event):
+        self.canvas.itemconfigure(self.quit_button_window,state = 'hidden')
         
     def dragwin(self,event):
         x = self.winfo_pointerx() - self.offsetx
@@ -49,7 +60,7 @@ class Win(tk.Tk):
         self.offsetx = event.x
         self.offsety = event.y
     
-    def close(self,event):
+    def close(self,event=None):
         self.destroy()
         
     def minimize(self,event):
@@ -72,9 +83,6 @@ class App():
         self.images = cycle([img for img in os.listdir('.') if img.lower()[-4:] in ('.jpg', '.png', '.gif')])
         self.image = None
     
-        self.canvas = tk.Canvas(self.root, bg="yellow")
-        self.canvas_image = self.canvas.create_image(0,0,anchor=tk.NW,image=None)
-        self.canvas.pack(expand = True, fill = "both")
         self.root.after(100, self.timer_cb) 
         self.root.mainloop()
     
@@ -138,6 +146,6 @@ class App():
         # apply changes
         self.root.geometry('{0}x{1}+{2}+{3}'.format(new_win_width, new_win_height, new_win_x, new_win_y))
         self.image = ImageTk.PhotoImage(self.new_image.resize(new_win_size, Image.ANTIALIAS))
-        self.canvas.itemconfig(self.canvas_image, image=self.image)
+        self.root.canvas.itemconfig(self.root.canvas_image, image=self.image)
         
 if __name__ == '__main__': app=App()
