@@ -38,7 +38,7 @@ class Win(tk.Tk):
         self.offsetx = 0
         self.offsety = 0
         
-        self.canvas = tk.Canvas(self)
+        self.canvas = tk.Canvas(self,borderwidth=0,highlightthickness=0)
         self.canvas_image = self.canvas.create_image(0,0,anchor=tk.NW,image=None)
         self.quit_button = tk.Button(self, text = "x", command = self.close, anchor = 'w', activebackground = "#33B5E5")
         self.quit_button_window = self.canvas.create_window(0, 0, anchor='nw', width=15,height=20, window=self.quit_button, state='hidden')
