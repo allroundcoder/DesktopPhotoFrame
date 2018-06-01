@@ -14,7 +14,7 @@ else:
 ###################
 # General setings #  
 ###################
-SLIDE_SHOW_TIME_MS = 3 * 1000
+SLIDE_SHOW_TIME_MS = 300 * 1000
 
 # Window height in portrait orientation. The same value is used
 # for the window width in landscape orientation.
@@ -31,7 +31,6 @@ class Win(tk.Tk):
         
         self.bind('<ButtonPress-1>',self.clickwin)
         self.bind('<B1-Motion>',self.dragwin)
-        self.bind('<Triple-Button-1>',self.close)
         self.bind("<Configure>", self.restore)
         self.bind("<Enter>", self.enter)
         self.bind("<Leave>", self.leave)
@@ -39,17 +38,21 @@ class Win(tk.Tk):
         self.offsetx = 0
         self.offsety = 0
         
-        self.canvas = tk.Canvas(self, bg="yellow")
+        self.canvas = tk.Canvas(self)
         self.canvas_image = self.canvas.create_image(0,0,anchor=tk.NW,image=None)
-        self.quit_button = tk.Button(self, text = "Quit", command = self.close, anchor = 'w', activebackground = "#33B5E5")
-        self.quit_button_window = self.canvas.create_window(0, 0, anchor='nw', window=self.quit_button, state='hidden')
+        self.quit_button = tk.Button(self, text = "x", command = self.close, anchor = 'w', activebackground = "#33B5E5")
+        self.quit_button_window = self.canvas.create_window(0, 0, anchor='nw', width=15,height=20, window=self.quit_button, state='hidden')
+        self.minimize_button = tk.Button(self, text = "-", command = self.minimize, anchor = 'w', activebackground = "#33B5E5")
+        self.minimize_button_window = self.canvas.create_window(15, 0, anchor='nw', width=15,height=20,window=self.minimize_button, state='hidden')
         self.canvas.pack(expand = True, fill = "both")
 
     def enter(self,event):
         self.canvas.itemconfigure(self.quit_button_window,state = 'normal')
+        self.canvas.itemconfigure(self.minimize_button_window,state = 'normal')
         
     def leave(self,event):
         self.canvas.itemconfigure(self.quit_button_window,state = 'hidden')
+        self.canvas.itemconfigure(self.minimize_button_window,state = 'hidden')
         
     def dragwin(self,event):
         x = self.winfo_pointerx() - self.offsetx
@@ -63,7 +66,7 @@ class Win(tk.Tk):
     def close(self,event=None):
         self.destroy()
         
-    def minimize(self,event):
+    def minimize(self,event=None):
         self.overrideredirect(False)
         self.wm_state('iconic')
     
