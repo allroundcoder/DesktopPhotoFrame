@@ -19,6 +19,8 @@ SLIDE_SHOW_TIME_MS = 300 * 1000
 # Window height in portrait orientation. The same value is used
 # for the window width in landscape orientation.
 WINDOW_HEIGHT_IN_PERCENTAGE_OF_SCREEN_HEIGHT = 30
+
+BUTTON_SIZE_PX = 20
 ###################
 
 class Win(tk.Tk):
@@ -41,18 +43,30 @@ class Win(tk.Tk):
         self.canvas = tk.Canvas(self,borderwidth=0,highlightthickness=0)
         self.canvas_image = self.canvas.create_image(0,0,anchor=tk.NW,image=None)
         self.quit_button = tk.Button(self, text = "x", command = self.close, borderwidth=0)
-        self.quit_button_window = self.canvas.create_window(0, 0, anchor='nw', width=20,height=20, window=self.quit_button, state='hidden')
+        self.quit_button_window = self.canvas.create_window(0, 0, anchor='nw', width=BUTTON_SIZE_PX,height=BUTTON_SIZE_PX, window=self.quit_button, state='hidden')
         self.minimize_button = tk.Button(self, text = "-", command = self.minimize, borderwidth=0)
-        self.minimize_button_window = self.canvas.create_window(20, 0, anchor='nw', width=20,height=20,window=self.minimize_button, state='hidden')
+        self.minimize_button_window = self.canvas.create_window(BUTTON_SIZE_PX, 0, anchor='nw', width=BUTTON_SIZE_PX,height=BUTTON_SIZE_PX,window=self.minimize_button, state='hidden')
         self.canvas.pack(expand = True, fill = "both")
 
+    def mouse_on_button_area(self):
+        '''Prevent event looping in enter and leave events'''
+        # TODO: Need to fix this a bit smarter. Does not seem to be an issue in all Tkinter versions.
+        result = False
+        abs_coord_x = self.winfo_pointerx() - self.winfo_rootx()
+        abs_coord_y = self.winfo_pointery() - self.winfo_rooty()
+        if abs_coord_x <  (2 * BUTTON_SIZE_PX) and abs_coord_y < BUTTON_SIZE_PX:
+            result = True
+        return result
+        
     def enter(self,event):
-        self.canvas.itemconfigure(self.quit_button_window,state = 'normal')
-        self.canvas.itemconfigure(self.minimize_button_window,state = 'normal')
+        if not self.mouse_on_button_area():
+            self.canvas.itemconfigure(self.quit_button_window,state = 'normal')
+            self.canvas.itemconfigure(self.minimize_button_window,state = 'normal')
         
     def leave(self,event):
-        self.canvas.itemconfigure(self.quit_button_window,state = 'hidden')
-        self.canvas.itemconfigure(self.minimize_button_window,state = 'hidden')
+        if not self.mouse_on_button_area(): 
+            self.canvas.itemconfigure(self.quit_button_window,state = 'hidden')
+            self.canvas.itemconfigure(self.minimize_button_window,state = 'hidden')
         
     def dragwin(self,event):
         x = self.winfo_pointerx() - self.offsetx
