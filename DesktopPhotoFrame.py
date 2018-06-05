@@ -31,15 +31,8 @@ class Win(tk.Tk):
         self.wm_attributes("-topmost", 1)
         self.pack_propagate(False)
         
-        self.bind('<ButtonPress-1>',self.clickwin)
-        self.bind('<B1-Motion>',self.dragwin)
-        self.bind("<Configure>", self.restore)
-        self.bind("<Enter>", self.enter)
-        self.bind("<Leave>", self.leave)
-        
         self.offsetx = 0
         self.offsety = 0
-        self.current_widget = None
         
         self.canvas = tk.Canvas(self,borderwidth=0,highlightthickness=0)
         self.canvas_image = self.canvas.create_image(0,0,anchor=tk.NW,image=None)
@@ -48,6 +41,12 @@ class Win(tk.Tk):
         self.minimize_button = tk.Button(self, text = "-", command = self.minimize, borderwidth=0)
         self.minimize_button_window = self.canvas.create_window(BUTTON_SIZE_PX, 0, anchor='nw', width=BUTTON_SIZE_PX,height=BUTTON_SIZE_PX,window=self.minimize_button, state='normal')
         self.canvas.pack(expand = True, fill = "both")
+        
+        self.bind('<ButtonPress-1>',self.clickwin)
+        self.bind('<B1-Motion>',self.dragwin)
+        self.bind("<Configure>", self.restore)
+        self.bind("<Enter>", self.enter)
+        self.bind("<Leave>", self.leave)
         
     def enter(self,event):
         self.canvas.itemconfigure(self.quit_button_window,state = 'normal')
@@ -118,20 +117,20 @@ class App():
         win_center_y = win_y + (win_height / 2)
 
         # new image
-        img_width, img_height = self.new_image.size
-        img_aspect_ratio = float(img_width) / float(img_height)
+        new_img_width, new_img_height = self.new_image.size
+        new_img_aspect_ratio = float(new_img_width) / float(new_img_height)
         
         # calculate new window size
         new_win_height_port = int(screen_height * (WINDOW_HEIGHT_IN_PERCENTAGE_OF_SCREEN_HEIGHT / 100.0))
         
-        if img_width > img_height:
+        if new_img_width > new_img_height:
             # landscape
             new_win_width = new_win_height_port
-            new_win_height = int(new_win_width / img_aspect_ratio)
+            new_win_height = int(new_win_width / new_img_aspect_ratio)
         else:
             # portrait
             new_win_height = new_win_height_port
-            new_win_width = int(new_win_height * img_aspect_ratio)
+            new_win_width = int(new_win_height * new_img_aspect_ratio)
             
         new_win_size = (new_win_width,new_win_height)
          
