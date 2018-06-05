@@ -37,9 +37,9 @@ class Win(tk.Tk):
         self.canvas = tk.Canvas(self,borderwidth=0,highlightthickness=0)
         self.canvas_image = self.canvas.create_image(0,0,anchor=tk.NW,image=None)
         self.quit_button = tk.Button(self, text = "x", command = self.close, borderwidth=0)
-        self.quit_button_window = self.canvas.create_window(0, 0, anchor='nw', width=BUTTON_SIZE_PX,height=BUTTON_SIZE_PX, window=self.quit_button, state='normal')
+        self.quit_button_window = self.canvas.create_window(0, 0, anchor='nw', width=BUTTON_SIZE_PX,height=BUTTON_SIZE_PX, window=self.quit_button, state='hidden')
         self.minimize_button = tk.Button(self, text = "-", command = self.minimize, borderwidth=0)
-        self.minimize_button_window = self.canvas.create_window(BUTTON_SIZE_PX, 0, anchor='nw', width=BUTTON_SIZE_PX,height=BUTTON_SIZE_PX,window=self.minimize_button, state='normal')
+        self.minimize_button_window = self.canvas.create_window(BUTTON_SIZE_PX, 0, anchor='nw', width=BUTTON_SIZE_PX,height=BUTTON_SIZE_PX,window=self.minimize_button, state='hidden')
         self.canvas.pack(expand = True, fill = "both")
         
         self.bind('<ButtonPress-1>',self.clickwin)
