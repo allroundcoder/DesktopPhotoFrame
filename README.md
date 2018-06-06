@@ -20,6 +20,6 @@ The figure below shows what is meant by 'keep one corner at the same position wh
 The red dot is the corner that is kept at the same position. It depends on current the position of the photo frame window on the screen. For each screen quadrant another corner is kept stable. This approach reduces the amount of wasted area around the photo.   
 
 
-The slideshow example of Jeremy Lowery (jeremylowery/slideshow) was used as a starting point.
+The slideshow example of Jeremy Lowery <https://github.com/jeremylowery/slideshow> was used as a starting point. Thanks Jeremy!
 
 
