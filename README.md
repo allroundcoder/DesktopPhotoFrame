@@ -23,7 +23,7 @@ based on the nearest screen corner. Not the screen corner itself is used, but th
 
 ![Alt text](README_images/monitor.png?raw=true "Monitor")
 
-The red dot is the corner that is kept at the same position. It depends on current the position of the photo window on the screen. For each screen quadrant another corner is kept stable. This approach reduces the amount of wasted area around the photo.   
+The red dot is the corner where the photo window is 'docked' to.   
 
 The slideshow example of Jeremy Lowery <https://github.com/jeremylowery/slideshow> was used as a starting point. Thanks Jeremy!
 
