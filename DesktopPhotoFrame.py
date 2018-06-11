@@ -14,13 +14,19 @@ else:
 ###################
 # General setings #  
 ###################
+# Slide show time in milliseconds.
 SLIDE_SHOW_TIME_MS = 300 * 1000
 
 # Window height in portrait orientation. The same value is used
 # for the window width in landscape orientation.
 WINDOW_HEIGHT_IN_PERCENTAGE_OF_SCREEN_HEIGHT = 30
 
+# Button size in pixels
 BUTTON_SIZE_PX = 20
+
+# Window opacity when mouse cursor is within window area
+# (value between 0.0 and 1.0)
+MOUSE_OVER_OPACITY = 0.3
 ###################
 
 class Win(tk.Tk):
@@ -51,11 +57,13 @@ class Win(tk.Tk):
     def enter(self,event):
         self.canvas.itemconfigure(self.quit_button_window,state = 'normal')
         self.canvas.itemconfigure(self.minimize_button_window,state = 'normal')
+        self.wm_attributes('-alpha', MOUSE_OVER_OPACITY)
         
     def leave(self,event):
         if str(event.widget) == '.':
             self.canvas.itemconfigure(self.quit_button_window,state = 'hidden')
             self.canvas.itemconfigure(self.minimize_button_window,state = 'hidden')
+            self.wm_attributes('-alpha',1.0)
         
     def dragwin(self,event):
         x = self.winfo_pointerx() - self.offsetx
