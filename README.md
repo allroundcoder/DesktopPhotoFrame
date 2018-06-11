@@ -25,6 +25,8 @@ based on the nearest screen corner. Not the screen corner itself is used, but th
 
 The red dot is the corner where the photo window is 'docked' to.   
 
+## Acknowledgement
+
 The slideshow example of Jeremy Lowery <https://github.com/jeremylowery/slideshow> was used as a starting point. Thanks Jeremy!
 
 
