@@ -24,9 +24,9 @@ WINDOW_HEIGHT_IN_PERCENTAGE_OF_SCREEN_HEIGHT = 30
 # Button size in pixels
 BUTTON_SIZE_PX = 20
 
-# Window opacity when mouse cursor is within window area
+# Window opacity when mouse button is down within window area
 # (value between 0.0 and 1.0)
-MOUSE_OVER_OPACITY = 0.3
+MOUSE_BUTTON_DOWN_OPACITY = 0.3
 ###################
 
 class Win(tk.Tk):
@@ -48,7 +48,8 @@ class Win(tk.Tk):
         self.minimize_button_window = self.canvas.create_window(BUTTON_SIZE_PX, 0, anchor='nw', width=BUTTON_SIZE_PX,height=BUTTON_SIZE_PX,window=self.minimize_button, state='hidden')
         self.canvas.pack(expand = True, fill = "both")
         
-        self.bind('<ButtonPress-1>',self.clickwin)
+        self.bind('<ButtonPress-1>',self.mouse_button_press)
+        self.bind('<ButtonRelease-1>',self.mouse_button_release)
         self.bind('<B1-Motion>',self.dragwin)
         self.bind("<Configure>", self.restore)
         self.bind("<Enter>", self.enter)
@@ -57,23 +58,25 @@ class Win(tk.Tk):
     def enter(self,event):
         self.canvas.itemconfigure(self.quit_button_window,state = 'normal')
         self.canvas.itemconfigure(self.minimize_button_window,state = 'normal')
-        self.wm_attributes('-alpha', MOUSE_OVER_OPACITY)
-        
+                
     def leave(self,event):
         if str(event.widget) == '.':
             self.canvas.itemconfigure(self.quit_button_window,state = 'hidden')
             self.canvas.itemconfigure(self.minimize_button_window,state = 'hidden')
-            self.wm_attributes('-alpha',1.0)
         
     def dragwin(self,event):
         x = self.winfo_pointerx() - self.offsetx
         y = self.winfo_pointery() - self.offsety
         self.geometry('+{x}+{y}'.format(x=x,y=y))
 
-    def clickwin(self,event):
+    def mouse_button_press(self,event):
         self.offsetx = event.x
         self.offsety = event.y
-    
+        self.wm_attributes('-alpha', MOUSE_BUTTON_DOWN_OPACITY)
+        
+    def mouse_button_release(self,event):
+        self.wm_attributes('-alpha', 1.0)
+        
     def close(self,event=None):
         self.destroy()
         
