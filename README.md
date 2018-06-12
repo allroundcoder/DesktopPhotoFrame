@@ -9,13 +9,13 @@ Simpy said: It's a small slide show viewer with the following extras:
 * Automatic docking to outmost window corner
 
 ## Borderless window
-The photo window is free of borders and static buttons, to let it look like a real photo as much as possible. (Conflicts a bit with the name DesktopPhoto**Frame** :-) )
+The photo window is free of window decoration (e.g. borders and static buttons) to let it look like a real photo as much as possible.
   
-## Always on the foreground
-The photo window stays on the foreground, even when other windows are put at the same position.
+## Always on the foreground (does not work on a Mac)
+The photo window stays on the foreground, on top of all other windows.
 
 ## No wasted window area around photo
-The photo window size is adapted to the scaled photo size, to prevent waste of window area around the photo. The longest size of the photo is scaled to a predefined percentage of the screen height. 
+The photo window size is fit to the scaled photo size, to prevent waste of window area around the photo. The longest side of the photo is scaled to a predefined percentage of the screen height. 
 
 ## Automatic docking to outmost window corner 
 When switching between different photos, the outmost window corner (closest to a screen corner) is kept stable to prevent the photo window from 'jumping' over the screen.
